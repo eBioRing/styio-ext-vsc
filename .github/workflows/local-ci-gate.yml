@@ -158,7 +158,7 @@ jobs:
         env:
           STYIO_LSPD_PATH: ${{ github.workspace }}\styio-nightly\build\windows\bin\styio_lspd.exe
         run: |
-          npm run check
-          npm run package:vsix
-          npm run test:lsp-wire
+          npm run check &&
+          npm run package:vsix &&
+          npm run test:lsp-wire &&
           npm run test:smoke
