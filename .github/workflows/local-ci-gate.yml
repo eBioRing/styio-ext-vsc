@@ -1,0 +1,178 @@
+name: local-ci-gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - nightly
+  workflow_dispatch:
+    inputs:
+      styio_ref:
+        description: 'Styio nightly commit, tag, or branch to build for this manual CI run.'
+        required: true
+        type: string
+        default: 'nightly'
+
+permissions:
+  contents: read
+
+env:
+  STYIO_CI_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.styio_ref || 'nightly' }}
+
+jobs:
+  local-ci-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout extension
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          path: styio-ext-vsc
+
+      - name: Checkout styio-nightly
+        uses: actions/checkout@v5
+        with:
+          repository: Unka-Malloc/styio-nightly
+          ref: ${{ env.STYIO_CI_REF }}
+          path: styio-nightly
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13.5'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+          cache-dependency-path: styio-ext-vsc/package-lock.json
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang-18 lld-18 llvm-18-dev xvfb
+
+      - name: Build styio_lspd
+        working-directory: styio-nightly
+        run: |
+          cmake -S . -B build/ci -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_COMPILER=clang-18 \
+            -DCMAKE_CXX_COMPILER=clang++-18 \
+            -DLLVM_DIR=/usr/lib/llvm-18/lib/cmake/llvm
+          cmake --build build/ci --target styio_lspd -j2
+
+      - name: Restore extension dependencies
+        working-directory: styio-ext-vsc
+        run: npm ci
+
+      - name: Run extension checks
+        working-directory: styio-ext-vsc
+        env:
+          STYIO_LSPD_PATH: ${{ github.workspace }}/styio-nightly/build/ci/bin/styio_lspd
+        run: |
+          npm run check
+          npm run package:vsix
+          npm run test:lsp-wire
+          xvfb-run -a npm run test:e2e
+
+  windows-extension-smoke:
+    runs-on: windows-latest
+    timeout-minutes: 75
+
+    steps:
+      - name: Checkout extension
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          path: styio-ext-vsc
+
+      - name: Checkout styio-nightly
+        uses: actions/checkout@v5
+        with:
+          repository: Unka-Malloc/styio-nightly
+          ref: ${{ env.STYIO_CI_REF }}
+          path: styio-nightly
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13.5'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+          cache-dependency-path: styio-ext-vsc/package-lock.json
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install CMake, Ninja, and LLVM
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: styio-llvm18
+          cache-environment: true
+          create-args: >-
+            cmake
+            ninja
+            llvm=18.1.8
+            llvmdev=18.1.8
+            clang-tools=18.1.8
+            zlib
+            zstd
+            libxml2
+
+      - name: Locate LLVM
+        shell: pwsh
+        run: |
+          $condaPrefix = Join-Path $env:MAMBA_ROOT_PREFIX "envs\styio-llvm18"
+          $llvmRoot = Join-Path $condaPrefix "Library"
+          $llvmConfig = Join-Path $llvmRoot "lib\cmake\llvm\LLVMConfig.cmake"
+          if (!(Test-Path $llvmConfig)) {
+            throw "LLVMConfig.cmake was not found"
+          }
+          Add-Content $env:GITHUB_PATH (Join-Path $llvmRoot "bin")
+          Add-Content $env:GITHUB_PATH (Join-Path $condaPrefix "Scripts")
+          Add-Content $env:GITHUB_ENV "LLVM_DIR=$(Split-Path -Parent $llvmConfig)"
+          Add-Content $env:GITHUB_ENV "STYIO_NATIVE_TOOLCHAIN_ROOT=$llvmRoot"
+
+      - name: Build styio_lspd.exe
+        shell: pwsh
+        working-directory: styio-nightly
+        run: |
+          cmake -S . -B build/windows -G Ninja `
+            -DCMAKE_BUILD_TYPE=Debug `
+            -DCMAKE_C_COMPILER=cl `
+            -DCMAKE_CXX_COMPILER=cl `
+            -DLLVM_DIR="$env:LLVM_DIR" `
+            -DCMAKE_PREFIX_PATH="$env:STYIO_NATIVE_TOOLCHAIN_ROOT" `
+            -Dzstd_DIR="$env:STYIO_NATIVE_TOOLCHAIN_ROOT\lib\cmake\zstd"
+          cmake --build build/windows --target styio_lspd -j2
+
+      - name: Restore extension dependencies
+        shell: pwsh
+        working-directory: styio-ext-vsc
+        run: npm ci
+
+      - name: Run Windows extension smoke
+        shell: pwsh
+        working-directory: styio-ext-vsc
+        env:
+          STYIO_LSPD_PATH: ${{ github.workspace }}\styio-nightly\build\windows\bin\styio_lspd.exe
+        run: |
+          npm run vscode:prepublish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node -e "require('fs').mkdirSync('dist',{recursive:true})"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npx vsce package --out dist/styio-language-support.vsix
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run test:lsp-wire
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run test:smoke

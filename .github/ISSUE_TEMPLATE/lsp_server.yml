@@ -1,0 +1,62 @@
+name: Language server issue
+description: Report diagnostics, completion, hover, navigation, symbols, or startup issues.
+title: '[LSP]: '
+labels:
+  - lsp
+body:
+  - type: input
+    id: extension-version
+    attributes:
+      label: Extension version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: server-version
+    attributes:
+      label: styio_lspd build or commit
+      placeholder: nightly commit, release version, or local build path
+    validations:
+      required: true
+  - type: dropdown
+    id: discovery
+    attributes:
+      label: Server discovery method
+      options:
+        - styio.server.path
+        - STYIO_LSPD_PATH
+        - STYIO_NIGHTLY_ROOT
+        - PATH
+        - Not found
+    validations:
+      required: true
+  - type: dropdown
+    id: feature
+    attributes:
+      label: Affected feature
+      options:
+        - startup
+        - diagnostics
+        - completion
+        - hover
+        - definition
+        - references
+        - document symbols
+        - workspace symbols
+        - semantic tokens
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Styio output channel
+      description: 'Paste relevant lines from "Styio: Show Output". Redact local private paths if needed.'
+      render: text
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include a small `.styio` snippet and the exact cursor position when applicable.
+    validations:
+      required: true

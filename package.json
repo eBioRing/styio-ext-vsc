@@ -1,0 +1,247 @@
+{
+  "name": "styio-language-support",
+  "displayName": "Styio Language Support",
+  "description": "Syntax highlighting and LSP-powered language features for Styio.",
+  "version": "0.1.0",
+  "publisher": "eBioRing",
+  "license": "Apache-2.0",
+  "icon": "assets/icon.png",
+  "qna": "marketplace",
+  "extensionKind": [
+    "workspace"
+  ],
+  "galleryBanner": {
+    "color": "#101820",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eBioRing/styio-ext-vsc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eBioRing/styio-ext-vsc/issues"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "styio",
+    "language",
+    "lsp",
+    "syntax",
+    "highlighting"
+  ],
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "TextMate highlighting is available in untrusted workspaces. The language server starts a local styio_lspd process only when Styio server support is enabled and a server can be resolved."
+    },
+    "virtualWorkspaces": {
+      "supported": "limited",
+      "description": "Syntax highlighting works in virtual workspaces. LSP features require a local file-system workspace so styio_lspd can index project files."
+    }
+  },
+  "activationEvents": [
+    "onLanguage:styio"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "styio",
+        "aliases": [
+          "Styio",
+          "styio",
+          "syo"
+        ],
+        "extensions": [
+          ".styio",
+          ".syo"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "styio",
+        "scopeName": "source.styio",
+        "path": "./syntaxes/styio.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "styio",
+        "path": "./snippets/styio.code-snippets"
+      }
+    ],
+    "configuration": {
+      "title": "Styio",
+      "type": "object",
+      "properties": {
+        "styio.server.enabled": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the Styio language server."
+        },
+        "styio.server.path": {
+          "scope": "resource",
+          "type": "string",
+          "default": "",
+          "description": "Path or command used to start styio_lspd. Empty means auto-discover from environment variables, sibling Styio builds, or PATH."
+        },
+        "styio.server.arguments": {
+          "scope": "resource",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Additional arguments passed to styio_lspd."
+        },
+        "styio.trace.server": {
+          "scope": "resource",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Trace communication between VS Code and styio_lspd."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "styio.restartLanguageServer",
+        "title": "Restart Language Server",
+        "category": "Styio"
+      },
+      {
+        "command": "styio.selectLanguageServer",
+        "title": "Select Language Server",
+        "category": "Styio"
+      },
+      {
+        "command": "styio.showOutput",
+        "title": "Show Output",
+        "category": "Styio"
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "styio",
+        "scopes": {
+          "namespace": [
+            "entity.name.namespace.styio"
+          ],
+          "type": [
+            "support.type.styio",
+            "entity.name.type.styio"
+          ],
+          "class": [
+            "entity.name.type.class.styio"
+          ],
+          "enum": [
+            "entity.name.type.enum.styio"
+          ],
+          "interface": [
+            "entity.name.type.interface.styio"
+          ],
+          "struct": [
+            "entity.name.type.struct.styio"
+          ],
+          "typeParameter": [
+            "entity.name.type.parameter.styio"
+          ],
+          "parameter": [
+            "variable.parameter.styio"
+          ],
+          "variable": [
+            "variable.other.styio"
+          ],
+          "property": [
+            "variable.other.property.styio"
+          ],
+          "function": [
+            "entity.name.function.styio"
+          ],
+          "method": [
+            "entity.name.function.member.styio"
+          ],
+          "macro": [
+            "entity.name.function.macro.styio"
+          ],
+          "keyword": [
+            "keyword.control.styio"
+          ],
+          "comment": [
+            "comment.line.double-slash.styio",
+            "comment.block.styio"
+          ],
+          "string": [
+            "string.quoted.double.styio",
+            "string.quoted.single.styio"
+          ],
+          "number": [
+            "constant.numeric.styio"
+          ],
+          "operator": [
+            "keyword.operator.styio"
+          ]
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile \u0026\u0026 npm run grammar:build \u0026\u0026 npm run release:preflight",
+    "compile": "npm run compile:tsc \u0026\u0026 npm run bundle",
+    "compile:tsc": "tsc -p .",
+    "bundle": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --minify --outfile=out/extension.js",
+    "watch": "tsc -w -p .",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "grammar:build": "node scripts/build-grammar.mjs",
+    "grammar:check": "node scripts/check-grammar.mjs",
+    "grammar:test": "vscode-tmgrammar-test -g syntaxes/styio.tmLanguage.json test/fixtures/grammar/*.styio",
+    "test:resolver": "node scripts/test-server-resolver.mjs",
+    "test:lsp-wire": "node out/test/lsp-wire.test.js",
+    "test:e2e": "node out/test/runTest.js",
+    "check": "npm run grammar:build \u0026\u0026 npm run compile \u0026\u0026 npm run lint \u0026\u0026 npm run format:check \u0026\u0026 npm run grammar:check \u0026\u0026 npm run grammar:test \u0026\u0026 npm run test:resolver",
+    "release:preflight": "node scripts/release-preflight.mjs",
+    "release:evidence-check": "node scripts/release-preflight.mjs --strict-evidence",
+    "release:account-check": "node scripts/release-account-check.mjs",
+    "package:vsix": "npm run check \u0026\u0026 npm run release:preflight \u0026\u0026 node -e \"require(\u0027fs\u0027).mkdirSync(\u0027dist\u0027,{recursive:true})\" \u0026\u0026 vsce package --out dist/styio-language-support.vsix",
+    "test:smoke": "node scripts/smoke-test.mjs"
+  },
+  "dependencies": {
+    "vscode-languageclient": "10.0.1"
+  },
+  "overrides": {
+    "mocha": {
+      "diff": "5.2.2",
+      "serialize-javascript": "7.0.6"
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/mocha": "10.0.10",
+    "@types/node": "26.0.1",
+    "@types/vscode": "1.125.0",
+    "@vscode/test-cli": "0.0.15",
+    "@vscode/test-electron": "3.0.0",
+    "@vscode/vsce": "3.9.2",
+    "esbuild": "0.28.1",
+    "eslint": "10.6.0",
+    "js-yaml": "5.2.0",
+    "mocha": "11.7.6",
+    "prettier": "3.9.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.62.0",
+    "vscode-tmgrammar-test": "0.1.3"
+  }
+}
