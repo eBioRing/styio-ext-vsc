@@ -6,9 +6,18 @@ on:
     branches:
       - nightly
   workflow_dispatch:
+    inputs:
+      styio_ref:
+        description: 'Styio nightly commit, tag, or branch to build for this manual CI run.'
+        required: true
+        type: string
+        default: 'nightly'
 
 permissions:
   contents: read
+
+env:
+  STYIO_CI_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.styio_ref || 'nightly' }}
 
 jobs:
   local-ci-gate:
@@ -26,7 +35,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: Unka-Malloc/styio-nightly
-          ref: nightly
+          ref: ${{ env.STYIO_CI_REF }}
           path: styio-nightly
 
       - name: Set up Python
@@ -85,7 +94,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: Unka-Malloc/styio-nightly
-          ref: nightly
+          ref: ${{ env.STYIO_CI_REF }}
           path: styio-nightly
 
       - name: Set up Python

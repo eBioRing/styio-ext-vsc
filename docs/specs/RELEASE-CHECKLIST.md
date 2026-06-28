@@ -15,6 +15,9 @@ Use this checklist for each Marketplace release.
 - [ ] `python scripts/repo-hygiene-gate.py --mode tracked`
 - [ ] `npm audit` against `https://registry.npmjs.org/`
 - [ ] Upstream `ctest -R styio_lspd_stdio_framing`
+- [ ] Manual `local-ci-gate` passes with `styio_ref` pinned to the intended
+      Styio release commit when the release depends on a not-yet-merged Styio
+      PR.
 - [ ] `VSCE_PAT=<redacted> npm run release:account-check`
 
 ## Manual Checks

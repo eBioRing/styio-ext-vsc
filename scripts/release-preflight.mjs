@@ -420,6 +420,8 @@ function validateWorkflowGates() {
     : '';
 
   for (const requiredText of [
+    'styio_ref',
+    'STYIO_CI_REF',
     'npm run package:vsix',
     'npm run test:lsp-wire',
     'npm run test:smoke'

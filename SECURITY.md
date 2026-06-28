@@ -9,8 +9,13 @@ version and the active `nightly` development branch.
 
 Please do not open public issues for vulnerabilities.
 
-Report security concerns through the repository security advisory flow when
-available, or contact the publisher privately before disclosure. Include:
+Report security concerns through GitHub private vulnerability reporting when
+available:
+
+<https://github.com/eBioRing/styio-ext-vsc/security/advisories/new>
+
+If private vulnerability reporting is unavailable, contact the publisher
+privately before disclosure. Include:
 
 - Styio Language Support version
 - VS Code version and operating system

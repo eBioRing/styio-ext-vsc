@@ -58,6 +58,22 @@ VSCE_PAT=<redacted> npm run release:account-check
 In GitHub Actions, `publish-marketplace.yml` reads the same value from the
 `VSCE_PAT` repository secret.
 
+## Pre-Merge Upstream Verification
+
+When a release candidate depends on an unmerged `styio-nightly` change, use the
+manual `local-ci-gate` workflow before publishing:
+
+1. Open `local-ci-gate` from the Actions tab.
+2. Run workflow with `styio_ref` set to the exact Styio commit SHA that should
+   be verified, such as the upstream PR head.
+3. Confirm both the Linux `local-ci-gate` job and `windows-extension-smoke` job
+   pass.
+
+Pull requests and pushes still use the floating `nightly` branch by default, so
+the normal CI signal continues to prove compatibility with the current Styio
+release channel. Publishing must still use `publish-marketplace.yml` with a
+pinned `styio_ref` or `STYIO_NIGHTLY_RELEASE_REF`.
+
 ## Publish
 
 1. Update `package.json` and `CHANGELOG.md`.
