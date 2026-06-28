@@ -106,12 +106,29 @@ Extension PR CI was rerun after the upstream merge. For extension commit
 requires an exact Styio commit SHA or tag and rejects floating or branch refs
 when publishing.
 
+Extension PR #1 was merged into `styio-ext-vsc/nightly` on 2026-06-28 as merge
+commit `09b6015acaa1be6484c8739d582a9213d2d754af`. The post-merge push CI for
+that commit completed successfully:
+
+- `repo-hygiene` run `28316365029`
+- `styio-audit` run `28316365028`
+- `local-ci-gate` run `28316365025`, including Linux `local-ci-gate` and
+  Windows `windows-extension-smoke`
+
+No local or remote `v0.1.0` tag existed at the time of this evidence update.
+Create that tag only after the final release evidence commit lands on
+`styio-ext-vsc/nightly`. The intended Styio release input for publishing is
+exact commit SHA `5b9685f71b495643f0f084eb896ca1fdfe3e17c0` or a Styio release
+tag that points at an equivalent or newer commit with ADR-0121.
+
 ## Remaining External Gates
 
 This candidate should not be considered published until:
 
 1. the `eBioRing` Marketplace publisher is confirmed;
 2. `VSCE_PAT` is configured and `npm run release:account-check` passes;
-3. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
+3. `v0.1.0` is created on the final reviewed `styio-ext-vsc/nightly` release
+   commit; and
+4. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
    an exact Styio commit SHA or tag, or a maintainer manually publishes the
    verified VSIX.
