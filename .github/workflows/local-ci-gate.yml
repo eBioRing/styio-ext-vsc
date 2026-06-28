@@ -116,6 +116,9 @@ jobs:
             llvm=18.1.8
             llvmdev=18.1.8
             clang-tools=18.1.8
+            zlib
+            zstd
+            libxml2
 
       - name: Locate LLVM
         shell: pwsh
@@ -129,6 +132,7 @@ jobs:
           Add-Content $env:GITHUB_PATH (Join-Path $llvmRoot "bin")
           Add-Content $env:GITHUB_PATH (Join-Path $condaPrefix "Scripts")
           Add-Content $env:GITHUB_ENV "LLVM_DIR=$(Split-Path -Parent $llvmConfig)"
+          Add-Content $env:GITHUB_ENV "STYIO_NATIVE_TOOLCHAIN_ROOT=$llvmRoot"
 
       - name: Build styio_lspd.exe
         shell: pwsh
@@ -138,7 +142,9 @@ jobs:
             -DCMAKE_BUILD_TYPE=Debug `
             -DCMAKE_C_COMPILER=cl `
             -DCMAKE_CXX_COMPILER=cl `
-            -DLLVM_DIR="$env:LLVM_DIR"
+            -DLLVM_DIR="$env:LLVM_DIR" `
+            -DCMAKE_PREFIX_PATH="$env:STYIO_NATIVE_TOOLCHAIN_ROOT" `
+            -Dzstd_DIR="$env:STYIO_NATIVE_TOOLCHAIN_ROOT\lib\cmake\zstd"
           cmake --build build/windows --target styio_lspd -j2
 
       - name: Restore extension dependencies
