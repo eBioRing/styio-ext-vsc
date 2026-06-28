@@ -1,0 +1,4 @@
+# add := (a: i32, b: i32) => a + b
+emoji_text := "smile"
+result: i32 := add(1, 2)
+typed_value: i

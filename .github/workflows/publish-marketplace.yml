@@ -1,0 +1,137 @@
+name: publish-marketplace
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to VS Code Marketplace instead of dry-running the package gate.'
+        required: true
+        type: boolean
+        default: false
+      styio_ref:
+        description: 'Styio nightly commit, tag, or branch to build. Pin this for publishing.'
+        required: true
+        type: string
+        default: 'nightly'
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      STYIO_RELEASE_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.styio_ref || vars.STYIO_NIGHTLY_RELEASE_REF }}
+      PUBLISH_REQUESTED: ${{ github.event_name == 'push' || inputs.publish == true }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          path: styio-ext-vsc
+
+      - name: Validate Styio release ref
+        run: |
+          if [ -z "${STYIO_RELEASE_REF}" ]; then
+            echo "::error::Set STYIO_NIGHTLY_RELEASE_REF to a Styio commit/tag before publishing from a release tag."
+            exit 1
+          fi
+          if [ "${PUBLISH_REQUESTED}" = "true" ] && [ "${STYIO_RELEASE_REF}" = "nightly" ]; then
+            echo "::error::Publishing requires a pinned Styio commit or tag, not floating nightly."
+            exit 1
+          fi
+          echo "Using styio-nightly ref: ${STYIO_RELEASE_REF}"
+
+      - name: Checkout styio-nightly
+        uses: actions/checkout@v5
+        with:
+          repository: Unka-Malloc/styio-nightly
+          ref: ${{ env.STYIO_RELEASE_REF }}
+          path: styio-nightly
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13.5'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+          cache-dependency-path: styio-ext-vsc/package-lock.json
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang-18 lld-18 llvm-18-dev xvfb
+
+      - name: Build styio_lspd
+        working-directory: styio-nightly
+        run: |
+          cmake -S . -B build/release-gate -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_COMPILER=clang-18 \
+            -DCMAKE_CXX_COMPILER=clang++-18 \
+            -DLLVM_DIR=/usr/lib/llvm-18/lib/cmake/llvm
+          cmake --build build/release-gate --target styio_lspd -j2
+
+      - name: Verify styio_lspd stdio framing
+        working-directory: styio-nightly
+        run: ctest --test-dir build/release-gate -R styio_lspd_stdio_framing --output-on-failure
+
+      - name: Restore dependencies
+        working-directory: styio-ext-vsc
+        run: npm ci
+
+      - name: Package release candidate
+        working-directory: styio-ext-vsc
+        run: npm run package:vsix
+
+      - name: Run release preflight against packaged tree
+        working-directory: styio-ext-vsc
+        run: npm run release:preflight
+
+      - name: Run release LSP wire gate
+        working-directory: styio-ext-vsc
+        env:
+          STYIO_LSPD_PATH: ${{ github.workspace }}/styio-nightly/build/release-gate/bin/styio_lspd
+        run: npm run test:lsp-wire
+
+      - name: Run release VS Code E2E gate
+        working-directory: styio-ext-vsc
+        env:
+          STYIO_LSPD_PATH: ${{ github.workspace }}/styio-nightly/build/release-gate/bin/styio_lspd
+        run: xvfb-run -a npm run test:e2e
+
+      - name: Run release VSIX smoke gate
+        working-directory: styio-ext-vsc
+        env:
+          STYIO_LSPD_PATH: ${{ github.workspace }}/styio-nightly/build/release-gate/bin/styio_lspd
+        run: xvfb-run -a npm run test:smoke
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: styio-language-support-vsix
+          path: styio-ext-vsc/dist/styio-language-support.vsix
+          if-no-files-found: error
+
+      - name: Verify Marketplace token
+        if: ${{ github.event_name == 'push' || inputs.publish == true }}
+        working-directory: styio-ext-vsc
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce verify-pat eBioRing
+
+      - name: Publish to VS Code Marketplace
+        if: ${{ github.event_name == 'push' || inputs.publish == true }}
+        working-directory: styio-ext-vsc
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce publish --packagePath dist/styio-language-support.vsix --skip-duplicate

@@ -1,0 +1,39 @@
+name: styio-audit
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout extension
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          path: styio-ext-vsc
+
+      - name: Checkout released styio-audit policy
+        uses: actions/checkout@v5
+        with:
+          repository: eBioRing/styio-audit
+          ref: stable
+          path: styio-audit
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13.5'
+
+      - name: Run released styio-audit gate
+        working-directory: styio-ext-vsc
+        run: |
+          git -C ../styio-audit rev-parse HEAD
+          python3 ../styio-audit/bin/styio-audit gate --repo . --project styio-ext-vsc

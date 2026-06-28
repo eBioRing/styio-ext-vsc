@@ -1,0 +1,67 @@
+// SYNTAX TEST "source.styio" "Styio syntax scopes"
+@import { core/io }
+// <- punctuation.definition.resource.styio
+// <~------ keyword.control.import.styio
+
+# add := (a: i32, b: i32) => { <| a + b }
+// <- punctuation.definition.function.styio
+// <~~--- entity.name.function.styio
+//    ^^ keyword.operator.assignment.final.styio
+//                        ^^ keyword.operator.flow.styio
+//                             ^^ keyword.operator.return.styio
+
+@price : f64|..10|
+// <- punctuation.definition.resource.styio
+// <~----- variable.other.resource.styio
+//       ^^^ support.type.primitive.styio
+//           ^^ keyword.operator.range.styio
+//             ^^ constant.numeric.integer.styio
+
+value <- @stdin : i64
+//    ^^ keyword.operator.flow.styio
+//       ^ punctuation.definition.resource.styio
+//        ^^^^^ support.variable.resource.standard.styio
+//                ^^^ support.type.primitive.styio
+
+value -> @stdout
+//    ^^ keyword.operator.flow.styio
+//       ^ punctuation.definition.resource.styio
+//        ^^^^^^ support.variable.resource.standard.styio
+
+||> [
+// <--- keyword.operator.task.styio
+//  ^ punctuation.section.brackets.begin.styio
+    job := { <| 42 }
+//      ^^ keyword.operator.assignment.final.styio
+//           ^^ keyword.operator.return.styio
+]
+
+?| job -> result: i64 | 0
+// <-- keyword.operator.await.styio
+//     ^^ keyword.operator.flow.styio
+//                ^^^ support.type.primitive.styio
+//                    ^ keyword.operator.fallback.styio
+
+result ?= {
+//     ^^ keyword.operator.match.styio
+    0 => "zero"
+//  ^ constant.numeric.integer.styio
+//    ^^ keyword.operator.flow.styio
+//       ^ string.quoted.double.styio punctuation.definition.string.begin.styio
+}
+
+items[0..]
+//   ^ punctuation.section.brackets.begin.styio
+//     ^^ keyword.operator.range.styio
+
+bad <~ token ~>
+//  ^^ invalid.illegal.reserved.wave.styio
+//           ^^ invalid.illegal.reserved.wave.styio
+
+message := "hello\n"
+//      ^^ keyword.operator.assignment.final.styio
+//         ^ string.quoted.double.styio punctuation.definition.string.begin.styio
+//               ^^ string.quoted.double.styio constant.character.escape.styio
+
+/* block */
+// <----------- comment.block.styio
