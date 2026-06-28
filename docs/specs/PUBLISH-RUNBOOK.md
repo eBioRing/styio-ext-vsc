@@ -71,26 +71,29 @@ manual `local-ci-gate` workflow before publishing:
 
 Pull requests and pushes still use the floating `nightly` branch by default, so
 the normal CI signal continues to prove compatibility with the current Styio
-release channel. Publishing must still use `publish-marketplace.yml` with a
-pinned `styio_ref` or `STYIO_NIGHTLY_RELEASE_REF`.
+release channel. Publishing must still use `publish-marketplace.yml` with
+`styio_ref` or `STYIO_NIGHTLY_RELEASE_REF` set to an exact Styio commit SHA or
+tag.
 
 ## Publish
 
 1. Update `package.json` and `CHANGELOG.md`.
 2. Run the local release candidate checkpoint.
-3. Set `STYIO_NIGHTLY_RELEASE_REF` to the Styio commit or tag that contains
-   ADR-0121. Tag-triggered publishing refuses a floating `nightly` ref.
+3. Set `STYIO_NIGHTLY_RELEASE_REF` to the Styio commit SHA or tag that contains
+   ADR-0121. Tag-triggered publishing refuses floating `nightly` and branch
+   refs.
 4. Commit the release.
 5. Tag the commit as `v<package.json version>`.
 6. Push the tag.
 7. Confirm `.github/workflows/publish-marketplace.yml` passes. It packages the
-   VSIX, runs release preflight, builds `styio_lspd`, runs the upstream framing
-   CTest, executes LSP wire/E2E/smoke gates, uploads the VSIX artifact, verifies
-   `VSCE_PAT`, and publishes with `vsce publish --packagePath`.
+   VSIX, runs release preflight and strict release evidence verification, builds
+   `styio_lspd`, runs the upstream framing CTest, executes LSP wire/E2E/smoke
+   gates, uploads the VSIX artifact, verifies `VSCE_PAT`, and publishes with
+   `vsce publish --packagePath`.
 
 Manual workflow dispatch defaults to a dry-run package gate. Set
-`publish=true` only when intentionally publishing, and pass a pinned
-`styio_ref` instead of the default `nightly`.
+`publish=true` only when intentionally publishing, and pass an exact Styio
+commit SHA or tag through `styio_ref` instead of the default `nightly`.
 
 ## Post-Publish Smoke
 

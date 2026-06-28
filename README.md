@@ -63,7 +63,7 @@ Platform binary names:
 | macOS    | `styio_lspd`                                            |
 
 If no server is found, TextMate highlighting still works and VS Code shows an
-actionable error with a **Select Server** option.
+actionable error with a **Styio: Select Language Server** option.
 
 ## Extension Settings
 

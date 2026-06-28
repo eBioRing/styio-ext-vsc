@@ -73,11 +73,13 @@ The VSIX excludes local development and verification files:
 ## Publish Automation
 
 `.github/workflows/publish-marketplace.yml` packages the VSIX, reruns release
-preflight, uploads the VSIX as an artifact, verifies `VSCE_PAT`, and publishes
-to Marketplace on `v*.*.*` tags. Tag-triggered publishing requires
-`STYIO_NIGHTLY_RELEASE_REF` and refuses the floating `nightly` ref. Manual
+preflight, verifies the recorded release evidence hash, uploads the VSIX as an
+artifact, verifies `VSCE_PAT`, and publishes to Marketplace on `v*.*.*` tags.
+Tag-triggered publishing requires `STYIO_NIGHTLY_RELEASE_REF` to be an exact
+Styio commit SHA or tag and refuses floating `nightly` or branch refs. Manual
 workflow dispatch defaults to a dry-run package gate; set `publish=true` only
-when intentionally publishing and pass a pinned `styio_ref`.
+when intentionally publishing and pass an exact Styio commit SHA or tag through
+`styio_ref`.
 
 See `docs/specs/PUBLISH-RUNBOOK.md` and
 `docs/specs/RELEASE-CHECKLIST.md` for maintainer-facing release operations.

@@ -8,7 +8,7 @@ candidate of `styio-language-support`.
 ## Artifact
 
 - VSIX: `dist/styio-language-support.vsix`
-- SHA256: `D0052B3BFD600CAAC5BF355E123862A19759275B1509AACCB1887496AAD84078`
+- SHA256: `BEC493165DB9014C82FF29423A0BC5690CE1EC85F1538EAA2B52467DC2372E4E`
 - Marketplace item id: `eBioRing.styio-language-support`
 - Marketplace state at audit time: not currently published
 
@@ -28,6 +28,14 @@ The following gates passed on Windows with
 - `.\scripts\checkpoint-health.ps1`
 - `npm audit` against `https://registry.npmjs.org/`
 - `python scripts/repo-hygiene-gate.py --mode tracked`
+
+After the publish workflow was hardened to reject branch refs for real
+publishing and to require `npm run release:evidence-check`, the VSIX was
+rebuilt and these gates were rerun: `npm run check`,
+`npm run release:preflight`, `npm run release:evidence-check`,
+`npm run test:lsp-wire`, `npm run test:e2e`, `npm run test:smoke`, `npm audit`
+against `https://registry.npmjs.org/`, and
+`python scripts/repo-hygiene-gate.py --mode tracked`.
 
 `npm run release:account-check` confirmed the Marketplace item id was not
 already published, then stopped because `VSCE_PAT was not set` in the local
@@ -67,6 +75,10 @@ The upstream Styio language server fix has been isolated onto branch
 `73531629b4350c296bb1aa584aa3b3ce95bd8f6f`. The latest verified head is
 `4d843a68040401261dfdc34f77ca452cd991f1dc`.
 
+The upstream pull request was merged into `styio-nightly/nightly` on
+2026-06-28 as merge commit
+`5b9685f71b495643f0f084eb896ca1fdfe3e17c0`.
+
 That branch contains the Windows stdio binary-mode fix, its CTest,
 `docs/adr/ADR-0121-lsp-windows-stdio-binary-mode.md`, and CI maintenance needed
 to keep the upstream release gate green while carrying the new LSP transport
@@ -89,7 +101,10 @@ The extension PR CI currently still reports the earlier `local-ci-gate` failure
 because that workflow checked out floating `styio-nightly` `nightly` before
 ADR-0121 was merged there. The extension repository now supports a manual
 `local-ci-gate` dispatch with `styio_ref` pinned to an upstream commit for
-pre-merge proof; the final publish gate still requires a pinned Styio ref.
+pre-merge proof; after the upstream merge, the normal floating-`nightly`
+extension CI should be rerun before publishing. The final publish gate requires
+an exact Styio commit SHA or tag and rejects floating or branch refs when
+publishing.
 
 ## Remaining External Gates
 
@@ -97,10 +112,8 @@ This candidate should not be considered published until:
 
 1. the `eBioRing` Marketplace publisher is confirmed;
 2. `VSCE_PAT` is configured and `npm run release:account-check` passes;
-3. the extension `local-ci-gate` is rerun with either floating `nightly` after
-   upstream merge or `styio_ref` pinned to
-   `4d843a68040401261dfdc34f77ca452cd991f1dc`;
-4. the upstream `styio_lspd` Windows stdio fix and CTest are merged into the
-   Styio release channel that users will install; and
-5. `.github/workflows/publish-marketplace.yml` publishes the tagged release or a
-   maintainer manually publishes the verified VSIX.
+3. the extension `local-ci-gate` is rerun against `styio-nightly/nightly` at or
+   after `5b9685f71b495643f0f084eb896ca1fdfe3e17c0`; and
+4. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
+   an exact Styio commit SHA or tag, or a maintainer manually publishes the
+   verified VSIX.

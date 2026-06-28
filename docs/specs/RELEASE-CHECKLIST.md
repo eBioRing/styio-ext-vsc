@@ -31,7 +31,8 @@ Use this checklist for each Marketplace release.
 - [ ] `VSCE_PAT` verifies with `npx vsce verify-pat eBioRing`.
 - [ ] The Styio release channel provides a `styio_lspd` build with ADR-0121.
 - [ ] `STYIO_NIGHTLY_RELEASE_REF` or manual `styio_ref` points at that exact
-      Styio commit/tag; publishing must not use floating `nightly`.
+      Styio commit/tag; publishing must not use floating `nightly` or a branch
+      ref.
 
 ## Post-Publish
 
