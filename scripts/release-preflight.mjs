@@ -422,6 +422,7 @@ function validateWorkflowGates() {
   for (const requiredText of [
     'styio_ref',
     'STYIO_CI_REF',
+    'stable',
     'npm run package:vsix',
     'npm run test:lsp-wire',
     'npm run test:smoke'
@@ -443,6 +444,9 @@ function validateWorkflowGates() {
     'PUBLISH_REQUESTED',
     'Publishing requires a pinned Styio commit or tag',
     'Publishing requires an exact Styio commit SHA or tag',
+    'Validate release branch',
+    'origin/stable',
+    'merge-base --is-ancestor',
     'refs/tags/${STYIO_RELEASE_REF}',
     'branch ref',
     'ctest --test-dir build/release-gate -R styio_lspd_stdio_framing',

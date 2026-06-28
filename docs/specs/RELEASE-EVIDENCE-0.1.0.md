@@ -8,7 +8,7 @@ candidate of `styio-language-support`.
 ## Artifact
 
 - VSIX: `dist/styio-language-support.vsix`
-- SHA256: `BEC493165DB9014C82FF29423A0BC5690CE1EC85F1538EAA2B52467DC2372E4E`
+- SHA256: `64D3D9B0FBCBAB1AB509A641551011D0A9EAA129BDF6906967F9202A5729EA88`
 - Marketplace item id: `eBioRing.styio-language-support`
 - Marketplace state at audit time: not currently published
 
@@ -36,6 +36,15 @@ rebuilt and these gates were rerun: `npm run check`,
 `npm run test:lsp-wire`, `npm run test:e2e`, `npm run test:smoke`, `npm audit`
 against `https://registry.npmjs.org/`, and
 `python scripts/repo-hygiene-gate.py --mode tracked`.
+
+The Windows grammar-test command now runs through `scripts/run-grammar-test.mjs`.
+This preserves `vscode-tmgrammar-test` coverage while tolerating only the exact
+Windows Node/libuv cleanup assertion that can occur after all grammar fixtures
+have already reported success. After this wrapper was added, `npm run check` and
+`npm run package:vsix` passed locally on Windows, then the rebuilt VSIX passed
+`npm run release:evidence-check`, `npm run test:lsp-wire`, `npm run test:e2e`,
+and `npm run test:smoke` with `STYIO_LSPD_PATH` pointing at the local Windows
+`styio_lspd.exe` build.
 
 `npm run release:account-check` confirmed the Marketplace item id was not
 already published, then stopped because `VSCE_PAT was not set` in the local
@@ -117,9 +126,10 @@ that commit completed successfully:
 
 No local or remote `v0.1.0` tag existed at the time of this evidence update.
 Create that tag only after the final release evidence commit lands on
-`styio-ext-vsc/nightly`. The intended Styio release input for publishing is
-exact commit SHA `5b9685f71b495643f0f084eb896ca1fdfe3e17c0` or a Styio release
-tag that points at an equivalent or newer commit with ADR-0121.
+`styio-ext-vsc/stable`. The repository default branch is `stable`, and release
+tags must point at a commit contained there. The intended Styio release input for
+publishing is exact commit SHA `5b9685f71b495643f0f084eb896ca1fdfe3e17c0` or a
+Styio release tag that points at an equivalent or newer commit with ADR-0121.
 
 ## Remaining External Gates
 
@@ -127,8 +137,9 @@ This candidate should not be considered published until:
 
 1. the `eBioRing` Marketplace publisher is confirmed;
 2. `VSCE_PAT` is configured and `npm run release:account-check` passes;
-3. `v0.1.0` is created on the final reviewed `styio-ext-vsc/nightly` release
+3. the final release candidate is promoted from `nightly` to `stable`;
+4. `v0.1.0` is created on the final reviewed `styio-ext-vsc/stable` release
    commit; and
-4. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
+5. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
    an exact Styio commit SHA or tag, or a maintainer manually publishes the
    verified VSIX.

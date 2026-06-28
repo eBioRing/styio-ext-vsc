@@ -33,6 +33,7 @@ Use this checklist for each Marketplace release.
 - [ ] `STYIO_NIGHTLY_RELEASE_REF` or manual `styio_ref` points at that exact
       Styio commit/tag; publishing must not use floating `nightly` or a branch
       ref.
+- [ ] The release tag points at a commit contained in `origin/stable`.
 
 ## Post-Publish
 

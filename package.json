@@ -207,7 +207,7 @@
     "format:check": "prettier --check .",
     "grammar:build": "node scripts/build-grammar.mjs",
     "grammar:check": "node scripts/check-grammar.mjs",
-    "grammar:test": "vscode-tmgrammar-test -g syntaxes/styio.tmLanguage.json test/fixtures/grammar/*.styio",
+    "grammar:test": "node scripts/run-grammar-test.mjs",
     "test:resolver": "node scripts/test-server-resolver.mjs",
     "test:lsp-wire": "node out/test/lsp-wire.test.js",
     "test:e2e": "node out/test/runTest.js",

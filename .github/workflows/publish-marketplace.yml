@@ -64,6 +64,17 @@ jobs:
           fi
           echo "Using styio-nightly ref: ${STYIO_RELEASE_REF}"
 
+      - name: Validate release branch
+        if: ${{ github.event_name == 'push' }}
+        working-directory: styio-ext-vsc
+        run: |
+          git fetch origin stable --depth=1
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" origin/stable; then
+            echo "::error::Release tags must point at a commit already merged into origin/stable."
+            exit 1
+          fi
+          echo "Release tag commit is contained in origin/stable."
+
       - name: Checkout styio-nightly
         uses: actions/checkout@v5
         with:

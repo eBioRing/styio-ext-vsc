@@ -66,8 +66,10 @@ The VSIX excludes local development and verification files:
 14. Inspect `npx vsce ls --tree` for unexpected files.
 15. Run `VSCE_PAT=<redacted> npm run release:account-check` before any manual
     publish.
-16. Tag the commit as `v<package.json version>`.
-17. Publish through `.github/workflows/publish-marketplace.yml`, or run
+16. Promote the verified `nightly` release candidate to the default `stable`
+    branch.
+17. Tag the final `stable` commit as `v<package.json version>`.
+18. Publish through `.github/workflows/publish-marketplace.yml`, or run
     `npx vsce publish --packagePath dist/styio-language-support.vsix`.
 
 ## Publish Automation
@@ -76,9 +78,10 @@ The VSIX excludes local development and verification files:
 preflight, verifies the recorded release evidence hash, uploads the VSIX as an
 artifact, verifies `VSCE_PAT`, and publishes to Marketplace on `v*.*.*` tags.
 Tag-triggered publishing requires `STYIO_NIGHTLY_RELEASE_REF` to be an exact
-Styio commit SHA or tag and refuses floating `nightly` or branch refs. Manual
-workflow dispatch defaults to a dry-run package gate; set `publish=true` only
-when intentionally publishing and pass an exact Styio commit SHA or tag through
+Styio commit SHA or tag, refuses floating `nightly` or branch refs, and rejects
+release tags whose commit is not contained in `origin/stable`. Manual workflow
+dispatch defaults to a dry-run package gate; set `publish=true` only when
+intentionally publishing and pass an exact Styio commit SHA or tag through
 `styio_ref`.
 
 See `docs/specs/PUBLISH-RUNBOOK.md` and

@@ -75,6 +75,11 @@ release channel. Publishing must still use `publish-marketplace.yml` with
 `styio_ref` or `STYIO_NIGHTLY_RELEASE_REF` set to an exact Styio commit SHA or
 tag.
 
+For production release, promote the verified `nightly` candidate into the
+repository default branch, `stable`, before tagging. Release tags must point at a
+commit already contained in `origin/stable`; the publish workflow enforces this
+for tag-triggered publishing.
+
 ## Publish
 
 1. Update `package.json` and `CHANGELOG.md`.
@@ -82,10 +87,11 @@ tag.
 3. Set `STYIO_NIGHTLY_RELEASE_REF` to the Styio commit SHA or tag that contains
    ADR-0121. Tag-triggered publishing refuses floating `nightly` and branch
    refs.
-4. Commit the release.
-5. Tag the commit as `v<package.json version>`.
-6. Push the tag.
-7. Confirm `.github/workflows/publish-marketplace.yml` passes. It packages the
+4. Commit the release candidate on `nightly`.
+5. Open and merge a `nightly` -> `stable` pull request after its CI passes.
+6. Tag the final `stable` commit as `v<package.json version>`.
+7. Push the tag.
+8. Confirm `.github/workflows/publish-marketplace.yml` passes. It packages the
    VSIX, runs release preflight and strict release evidence verification, builds
    `styio_lspd`, runs the upstream framing CTest, executes LSP wire/E2E/smoke
    gates, uploads the VSIX artifact, verifies `VSCE_PAT`, and publishes with
