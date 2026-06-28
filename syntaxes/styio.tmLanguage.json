@@ -1,0 +1,395 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Styio",
+  "scopeName": "source.styio",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#imports"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#resources"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#punctuation"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.styio",
+          "begin": "//",
+          "end": "$"
+        },
+        {
+          "name": "comment.block.styio",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.format.styio",
+          "begin": "\\$\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styio"
+            }
+          },
+          "end": "\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styio"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#escapes"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.double.styio",
+          "begin": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styio"
+            }
+          },
+          "end": "\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styio"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#escapes"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.styio",
+          "begin": "'",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styio"
+            }
+          },
+          "end": "'",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styio"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#escapes"
+            }
+          ]
+        }
+      ]
+    },
+    "escapes": {
+      "patterns": [
+        {
+          "name": "constant.character.escape.styio",
+          "match": "\\\\(n|t|r|0|\\\\|\"|')"
+        },
+        {
+          "name": "invalid.illegal.escape.styio",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "imports": {
+      "patterns": [
+        {
+          "name": "meta.import.styio",
+          "match": "(@)(import)\\b",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.resource.styio"
+            },
+            "2": {
+              "name": "keyword.control.import.styio"
+            }
+          }
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "meta.function.definition.styio",
+          "match": "(#)\\s*([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.function.styio"
+            },
+            "2": {
+              "name": "entity.name.function.styio"
+            }
+          }
+        },
+        {
+          "name": "punctuation.definition.closure.styio",
+          "match": "#(?=\\()"
+        }
+      ]
+    },
+    "resources": {
+      "patterns": [
+        {
+          "name": "meta.resource.standard.styio",
+          "match": "(@)(stdin|stdout|stderr)\\b",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.resource.styio"
+            },
+            "2": {
+              "name": "support.variable.resource.standard.styio"
+            }
+          }
+        },
+        {
+          "name": "constant.language.resource.empty.styio",
+          "match": "@\\(\\)"
+        },
+        {
+          "name": "meta.resource.family.member.styio",
+          "match": "(@)([A-Za-z_][A-Za-z0-9_]*)(::)([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.resource.styio"
+            },
+            "2": {
+              "name": "entity.name.type.resource.styio"
+            },
+            "3": {
+              "name": "punctuation.accessor.double-colon.styio"
+            },
+            "4": {
+              "name": "entity.name.function.member.styio"
+            }
+          }
+        },
+        {
+          "name": "meta.resource.constructor.styio",
+          "match": "(@)([A-Za-z_][A-Za-z0-9_]*)(?=\\()",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.resource.styio"
+            },
+            "2": {
+              "name": "entity.name.type.resource.styio"
+            }
+          }
+        },
+        {
+          "name": "meta.resource.declaration.styio",
+          "match": "(@)([A-Za-z_][A-Za-z0-9_]*)(?=\\s*:)",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.resource.styio"
+            },
+            "2": {
+              "name": "variable.other.resource.styio"
+            }
+          }
+        },
+        {
+          "name": "punctuation.definition.resource.styio",
+          "match": "@(?=[({])"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "support.type.primitive.styio",
+          "match": "\\b(i8|i16|i32|i64|i128|f32|f64|bool|char|string|byte|matrix)\\b"
+        },
+        {
+          "name": "support.type.collection.styio",
+          "match": "\\b(list|dict)\\b(?=\\s*\\[)"
+        },
+        {
+          "name": "entity.name.type.placeholder.styio",
+          "match": "\\b__+\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.styio",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "keyword.other.schema.styio",
+          "match": "\\bschema\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.float.styio",
+          "match": "\\b-?\\d+\\.\\d+\\b"
+        },
+        {
+          "name": "constant.numeric.integer.styio",
+          "match": "\\b-?\\d+\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "invalid.illegal.reserved.wave.styio",
+          "match": "<~|~>"
+        },
+        {
+          "name": "keyword.operator.task.styio",
+          "match": "\\|\\|>"
+        },
+        {
+          "name": "keyword.operator.await.styio",
+          "match": "\\?\\|"
+        },
+        {
+          "name": "keyword.operator.match.styio",
+          "match": "\\?="
+        },
+        {
+          "name": "keyword.operator.return.inline.styio",
+          "match": "\\|<\\|"
+        },
+        {
+          "name": "keyword.operator.return.styio",
+          "match": "<\\|"
+        },
+        {
+          "name": "keyword.operator.assignment.final.styio",
+          "match": ":="
+        },
+        {
+          "name": "keyword.operator.assignment.compound.styio",
+          "match": "\\+=|-=|\\*=|/="
+        },
+        {
+          "name": "keyword.operator.flow.styio",
+          "match": "->|<-|<<|>>|=>"
+        },
+        {
+          "name": "keyword.operator.logical.styio",
+          "match": "&&|\\|\\||!"
+        },
+        {
+          "name": "keyword.operator.comparison.styio",
+          "match": "==|!=|>=|<=|>|<"
+        },
+        {
+          "name": "keyword.operator.arithmetic.styio",
+          "match": "\\*\\*|[+\\-*/%]"
+        },
+        {
+          "name": "keyword.operator.range.styio",
+          "match": "\\.{2,}"
+        },
+        {
+          "name": "keyword.operator.diagnostic.styio",
+          "match": "\\?\\?"
+        },
+        {
+          "name": "keyword.operator.fallback.styio",
+          "match": "\\|"
+        },
+        {
+          "name": "keyword.operator.break.styio",
+          "match": "\\^+"
+        },
+        {
+          "name": "keyword.operator.zip.styio",
+          "match": "&"
+        },
+        {
+          "name": "keyword.operator.assignment.styio",
+          "match": "="
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.separator.statement.pipe.styio",
+          "match": "\\|;"
+        },
+        {
+          "name": "punctuation.section.block.begin.styio",
+          "match": "\\{"
+        },
+        {
+          "name": "punctuation.section.block.end.styio",
+          "match": "\\}"
+        },
+        {
+          "name": "punctuation.section.brackets.begin.styio",
+          "match": "\\["
+        },
+        {
+          "name": "punctuation.section.brackets.end.styio",
+          "match": "\\]"
+        },
+        {
+          "name": "punctuation.section.parens.begin.styio",
+          "match": "\\("
+        },
+        {
+          "name": "punctuation.section.parens.end.styio",
+          "match": "\\)"
+        },
+        {
+          "name": "punctuation.separator.comma.styio",
+          "match": ","
+        },
+        {
+          "name": "punctuation.separator.colon.styio",
+          "match": ":"
+        },
+        {
+          "name": "punctuation.terminator.statement.styio",
+          "match": ";"
+        },
+        {
+          "name": "punctuation.accessor.dot.styio",
+          "match": "\\."
+        }
+      ]
+    }
+  }
+}

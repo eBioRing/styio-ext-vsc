@@ -1,0 +1,52 @@
+{
+  "Import": {
+    "prefix": "import",
+    "body": ["@import { ${1:pkg/module} }"],
+    "description": "Import a Styio module."
+  },
+  "Function": {
+    "prefix": "fn",
+    "body": ["# ${1:name} : ${2:i64} := (${3:arg}: ${4:i64}) => {", "    <| ${5:arg}", "}"],
+    "description": "Define a Styio function."
+  },
+  "Resource Slot": {
+    "prefix": "res",
+    "body": ["@${1:name} : ${2:f64}|..${3:10}|"],
+    "description": "Declare a resource slot."
+  },
+  "Conditional": {
+    "prefix": "if",
+    "body": ["?(${1:condition}) => {", "    ${2}", "} | {", "    ${3}", "}"],
+    "description": "Guarded conditional block."
+  },
+  "Match": {
+    "prefix": "match",
+    "body": ["${1:value} ?= {", "    ${2:0} => ${3:result}", "    _ => ${4:fallback}", "}"],
+    "description": "Match expression."
+  },
+  "Stdin Pull": {
+    "prefix": "stdin",
+    "body": ["${1:value} <- @stdin : ${2:i64}"],
+    "description": "Pull a typed value from stdin."
+  },
+  "Stdout Write": {
+    "prefix": "stdout",
+    "body": ["${1:value} -> @stdout"],
+    "description": "Write a value to stdout."
+  },
+  "Task Group": {
+    "prefix": "taskgroup",
+    "body": ["||> [", "    ${1:job} := {", "        <| ${2:value}", "    }", "]"],
+    "description": "Launch a task group."
+  },
+  "Await With Fallback": {
+    "prefix": "await",
+    "body": ["?| ${1:job} -> ${2:value}: ${3:i64} | ${4:0}"],
+    "description": "Await a task with fallback."
+  },
+  "Resource Effect Fallback": {
+    "prefix": "effect",
+    "body": ["${1:value}: ${2:i64} = ?| (${3:operation}) | ${4:fallback}"],
+    "description": "Evaluate a resource operation with fallback."
+  }
+}

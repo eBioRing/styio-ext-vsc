@@ -1,0 +1,16 @@
+node_modules/
+out/
+dist/
+.vscode-test/
+.cache/
+.eslintcache
+coverage/
+*.vsix
+*.log
+*.tmp
+*.tsbuildinfo
+.DS_Store
+.idea/
+.cursor/
+__pycache__/
+.pytest_cache/
