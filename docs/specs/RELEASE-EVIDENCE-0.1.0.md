@@ -131,15 +131,26 @@ tags must point at a commit contained there. The intended Styio release input fo
 publishing is exact commit SHA `5b9685f71b495643f0f084eb896ca1fdfe3e17c0` or a
 Styio release tag that points at an equivalent or newer commit with ADR-0121.
 
+Release promotion PR #2 merged the validated `nightly` candidate into
+`styio-ext-vsc/stable` on 2026-06-28 as merge commit
+`d60682b962dde913ed74caa591c84a0f78365de8`. The post-merge push CI for that
+commit completed successfully:
+
+- `repo-hygiene` run `28317446208`
+- `styio-audit` run `28317446212`
+- `local-ci-gate` run `28317446228`, including Linux `local-ci-gate` and
+  Windows `windows-extension-smoke`
+- Dependabot dynamic checks `github_actions in /. - Update #1437381735` and
+  `npm_and_yarn in /. - Update #1437381732`
+
 ## Remaining External Gates
 
 This candidate should not be considered published until:
 
 1. the `eBioRing` Marketplace publisher is confirmed;
 2. `VSCE_PAT` is configured and `npm run release:account-check` passes;
-3. the final release candidate is promoted from `nightly` to `stable`;
-4. `v0.1.0` is created on the final reviewed `styio-ext-vsc/stable` release
+3. `v0.1.0` is created on the final reviewed `styio-ext-vsc/stable` release
    commit; and
-5. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
+4. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
    an exact Styio commit SHA or tag, or a maintainer manually publishes the
    verified VSIX.
