@@ -97,14 +97,14 @@ build. It starts the real `styio_lspd` executable, sends an `initialize`
 request, reads raw stdout bytes, and rejects malformed LSP boundaries such as
 `\r\r\n\r\r\n`.
 
-The extension PR CI currently still reports the earlier `local-ci-gate` failure
-because that workflow checked out floating `styio-nightly` `nightly` before
-ADR-0121 was merged there. The extension repository now supports a manual
-`local-ci-gate` dispatch with `styio_ref` pinned to an upstream commit for
-pre-merge proof; after the upstream merge, the normal floating-`nightly`
-extension CI should be rerun before publishing. The final publish gate requires
-an exact Styio commit SHA or tag and rejects floating or branch refs when
-publishing.
+Extension PR CI was rerun after the upstream merge. For extension commit
+`046a0a1a61774be3ff8df634b39cafcb882dc11f`, GitHub Actions checked out
+`styio-nightly/nightly` at merge commit
+`5b9685f71b495643f0f084eb896ca1fdfe3e17c0`; `repo-hygiene`,
+`styio-audit`, the Linux `local-ci-gate`, and the Windows
+`windows-extension-smoke` job all completed successfully. The final publish gate
+requires an exact Styio commit SHA or tag and rejects floating or branch refs
+when publishing.
 
 ## Remaining External Gates
 
@@ -112,8 +112,6 @@ This candidate should not be considered published until:
 
 1. the `eBioRing` Marketplace publisher is confirmed;
 2. `VSCE_PAT` is configured and `npm run release:account-check` passes;
-3. the extension `local-ci-gate` is rerun against `styio-nightly/nightly` at or
-   after `5b9685f71b495643f0f084eb896ca1fdfe3e17c0`; and
-4. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
+3. `.github/workflows/publish-marketplace.yml` publishes the tagged release with
    an exact Styio commit SHA or tag, or a maintainer manually publishes the
    verified VSIX.
