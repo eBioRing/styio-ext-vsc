@@ -116,7 +116,7 @@ jobs:
           arch: x64
 
       - name: Install CMake, Ninja, and LLVM
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-name: styio-llvm18
           cache-environment: true
