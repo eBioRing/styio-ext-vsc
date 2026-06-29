@@ -15,13 +15,13 @@ jobs:
 
     steps:
       - name: Checkout extension
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           path: styio-ext-vsc
 
       - name: Checkout released styio-audit policy
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: eBioRing/styio-audit
           ref: stable

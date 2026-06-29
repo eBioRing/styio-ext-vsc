@@ -27,13 +27,13 @@ jobs:
 
     steps:
       - name: Checkout extension
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           path: styio-ext-vsc
 
       - name: Checkout styio-nightly
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: Unka-Malloc/styio-nightly
           ref: ${{ env.STYIO_CI_REF }}
@@ -86,13 +86,13 @@ jobs:
 
     steps:
       - name: Checkout extension
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           path: styio-ext-vsc
 
       - name: Checkout styio-nightly
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: Unka-Malloc/styio-nightly
           ref: ${{ env.STYIO_CI_REF }}
