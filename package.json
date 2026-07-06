@@ -219,7 +219,7 @@
     "test:smoke": "node scripts/smoke-test.mjs"
   },
   "dependencies": {
-    "vscode-languageclient": "10.0.1"
+    "vscode-languageclient": "10.1.0"
   },
   "overrides": {
     "mocha": {
