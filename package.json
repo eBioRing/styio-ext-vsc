@@ -230,8 +230,8 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/mocha": "10.0.10",
-    "@types/node": "26.0.1",
-    "@types/vscode": "1.125.0",
+    "@types/node": "26.2.0",
+    "@types/vscode": "1.134.0",
     "@vscode/test-cli": "0.0.15",
     "@vscode/test-electron": "3.0.0",
     "@vscode/vsce": "3.9.2",
@@ -240,8 +240,8 @@
     "js-yaml": "5.2.0",
     "mocha": "11.7.6",
     "prettier": "3.9.0",
-    "typescript": "6.0.3",
-    "typescript-eslint": "8.62.0",
+    "typescript": "7.0.2",
+    "typescript-eslint": "8.67.0",
     "vscode-tmgrammar-test": "0.1.3"
   }
 }
